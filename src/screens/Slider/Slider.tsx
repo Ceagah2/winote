@@ -62,23 +62,21 @@ export const Slider = () => {
    navigation.navigate("Home");
  };
 
+ const button = (text: string) => {
+   return <S.Description>{text}</S.Description>;
+ };
 
   useEffect(() => {
     initializeIsOnboarded();
   }, [initializeIsOnboarded]);
 
- 
-
-
   return (
-    <AppIntroSlider 
+    <AppIntroSlider
       data={slides}
       renderItem={Slide}
       onDone={onDone}
-      renderPrevButton={() => null}
-      doneLabel="Começar"
-      prevLabel="Voltar"
-      nextLabel="Avançar"
+      doneLabel={button("Começar")}
+      nextLabel={button("Próximo")}
       showDoneButton
     />
   );
