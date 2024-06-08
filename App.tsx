@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import AppLoading from 'expo-app-loading';
 import { useFonts } from 'expo-font';
 import {
   Montserrat_300Light,
@@ -20,13 +19,13 @@ import { getData } from './src/services/getStorage';
 import { Home } from './src/screens/Home';
 import { Slider } from './src/screens/Slider';
 import { RootStackParamList } from './src/shared/navigationTypes';
+import { ActivityIndicator } from 'react-native';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   const [isOnboarded, setIsOnboarded] = useState<string | null>(null);
 
-  // Carregamento das fontes
   const [fontsLoaded] = useFonts({
     Montserrat_300Light,
     Montserrat_400Regular,
@@ -38,7 +37,6 @@ export default function App() {
     OpenSans_700Bold,
   });
 
-  // Verificação do estado de onboarding
   useEffect(() => {
     const checkOnboarding = async () => {
       const onboarded = await getData('@isOnboarded');
@@ -48,9 +46,8 @@ export default function App() {
     checkOnboarding();
   }, []);
 
-  // Exibir AppLoading enquanto as fontes ou estado de onboarding não estão carregados
   if (!fontsLoaded || isOnboarded === null) {
-    return <AppLoading />;
+    return <ActivityIndicator />;
   }
 
   return (
