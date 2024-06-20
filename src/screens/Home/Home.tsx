@@ -38,7 +38,6 @@ export const Home = () => {
     }
   };
 
-
   useEffect(() => {
     if (storedNotes) {
       setUserNotes(storedNotes);

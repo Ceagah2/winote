@@ -31,6 +31,7 @@ export const Error = styled.Text`
 
 export const SearchContainer = styled.View`
   width: 400px;
+  height: 80px;
   padding: 20px;
   flex-direction: row;
   justify-content: space-between;
