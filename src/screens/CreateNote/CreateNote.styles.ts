@@ -31,6 +31,7 @@ export const AudioContainer = styled.View`
 
 export const Audio = styled.View`
   width: 100%;
+  height: 30px;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
@@ -47,7 +48,9 @@ export const AudioTitle = styled.Text`
   font-family: 'Montserrat_500Medium';
   font-size: ${useResponsive(12)};
   color: ${colors.text};
-  width: 70%;
+`
+export const AudioWave = styled.View`
+  flex: 1;
 `
 export const AudioDuration = styled.Text`
   font-family: 'Montserrat_300Light';

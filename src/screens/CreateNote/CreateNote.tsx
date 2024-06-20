@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
+import Slider from "@react-native-community/slider";
 import { Audio } from "expo-av";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CollapsibleButtonWithDrawer } from "../../components/CollapseButtonWithDrawer";
 import { Container } from "../../components/Container";
 import { Header } from "../../components/Header";
@@ -9,12 +10,35 @@ import { INotes } from "../../shared/Notes.interface";
 import { colors } from "../../styles";
 import * as S from "./CreateNote.styles";
 
+const MockedAudios = [
+  {
+    id: 1,
+    name: "Audio 1",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    duration: "00:06:13",
+  },
+  {
+    id: 2,
+    name: "Audio 2",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    duration: "00:06:13",
+  },
+  {
+    id: 3,
+    name: "Audio 3",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    duration: "00:06:13",
+  },
+];
 
 export const CreateNote = () => {
   const [data, setData] = useState<INotes>({});
-  const [audios, setAudios] = useState([]);
+  const [audios, setAudios] = useState(MockedAudios);
   const [playingAudioId, setPlayingAudioId] = useState<number | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [position, setPosition] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
+  const [isSliding, setIsSliding] = useState<boolean>(false);
 
   const handlePlayPause = async (audio: (typeof MockedAudios)[0]) => {
     if (playingAudioId === audio.id) {
@@ -34,11 +58,26 @@ export const CreateNote = () => {
       setPlayingAudioId(audio.id);
 
       newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.didJustFinish) {
-          setPlayingAudioId(null);
+        if (status.isLoaded) {
+          setPosition(status.positionMillis);
+          setDuration(status.durationMillis || 0);
+          if (status.didJustFinish) {
+            setPlayingAudioId(null);
+          }
         }
       });
     }
+  };
+
+  const handleSliderValueChange = (value: number) => {
+    setPosition(value);
+  };
+
+  const handleSlidingComplete = async (value: number) => {
+    if (sound) {
+      await sound.setPositionAsync(value);
+    }
+    setIsSliding(false);
   };
 
   const handleDelete = (audioId: number) => {
@@ -48,6 +87,17 @@ export const CreateNote = () => {
       setPlayingAudioId(null);
     }
   };
+  const handleSaveNote = () => {
+    console.log(`Salvando dados : ${JSON.stringify(data)}`);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
+  }, [sound]);
 
   return (
     <Container>
@@ -55,7 +105,7 @@ export const CreateNote = () => {
         <Header
           title="Nova nota"
           isSavable
-          onSave={() => console.log("Salvando")}
+          onSave={handleSaveNote}
         />
         <S.TitleContainer>
           <TextInput
@@ -89,6 +139,17 @@ export const CreateNote = () => {
                 </S.AudioIcon>
                 <S.AudioTitle>{audio.name}</S.AudioTitle>
                 <S.AudioDuration>{audio.duration}</S.AudioDuration>
+                {playingAudioId === audio.id && (
+                  <Slider
+                    style={{ width: 200, height: 40 }}
+                    minimumValue={0}
+                    maximumValue={duration}
+                    value={position}
+                    onValueChange={handleSliderValueChange}
+                    onSlidingStart={() => setIsSliding(true)}
+                    onSlidingComplete={handleSlidingComplete}
+                  />
+                )}
                 <S.AudioIcon onPress={() => handleDelete(audio.id)}>
                   <Ionicons name="trash" size={20} color={colors.cta} />
                 </S.AudioIcon>
