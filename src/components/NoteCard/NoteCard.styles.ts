@@ -5,24 +5,25 @@ import { colors } from '../../styles'
 export const Container = styled.TouchableOpacity`
   width: 100%;
   height: 100px;
-  background-color: ${colors.background};
+  padding: 10px;
+  flex-direction: row;
   border-radius: 16px;
   margin-bottom: 20px;
-  padding: 10px;
-  border: 1px solid ${colors.text};
-  flex-direction: row;
+  border: 2px solid ${colors.cta};
+  background-color: ${colors.background};
 `
 export const IconContainer = styled.View`
-  width: 75px;
+  width: 50px;
   height: 100%;
   justify-content: center;
   align-items: center;
-  margin-right: 5px;
+  margin-right: 20px;
 `
 export const TextContainer = styled.View`
   width: 100%;
   flex-direction: column;
-  justify-content: space-between;
+  padding-top: 8px;
+  gap: 8px;
 `
 export const Title = styled.Text`
   font-family: 'OpenSans_700Bold';

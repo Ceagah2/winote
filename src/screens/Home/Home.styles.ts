@@ -41,7 +41,7 @@ export const SearchContainer = styled.View`
 export const NoteContainer = styled.ScrollView`
   width: 100%;
 `
-export const Note444 = styled.View`
+export const Note404 = styled.View`
   width: 100%;
   height: 100px;
   justify-content: center;

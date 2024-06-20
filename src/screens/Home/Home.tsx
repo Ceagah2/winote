@@ -1,40 +1,50 @@
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useAtom } from 'jotai';
 import React, { useEffect, useState } from "react";
+import { CollapsibleButtonWithDrawer } from '../../components/CollapseButtonWithDrawer';
 import { Container } from "../../components/Container/Container.styles";
 import { NoteCard } from '../../components/NoteCard';
 import { INoteCardProps } from '../../components/NoteCard/NoteCard.interface';
 import { TextInput } from "../../components/TextInput";
-import { MockedNote } from "../../mock/note";
+import { storedUserNotesAtom } from '../../store/globalStates';
 import { colors } from '../../styles';
 import * as S from './Home.styles';
 
 export const Home = () => {
-  const [search, setSearch] = useState<string>('');
   const navigation = useNavigation()
-  const [MockedNotes, setMockedNotes] = useState<INoteCardProps[]>([])
+  const [search, setSearch] = useState<string>('');
+  const [userNotes, setUserNotes] = useState<INoteCardProps[]>([])
+  const [storedNotes] = useAtom(storedUserNotesAtom)
   const [searchError,setSearchError] = useState<boolean>(false)
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+ 
 
   const handleSearch = (search: string) => {
     if (search) {
-      const filteredNotes = MockedNote.filter((note) => {
+      const filteredNotes = userNotes.filter((note) => {
         if (note.title.toLowerCase().includes(search.toLowerCase())) {
           return true;
         }
         return false;
       });
-      setMockedNotes(filteredNotes);
+      setUserNotes(filteredNotes);
       setSearchError(
         filteredNotes.length === 0 ? true : false
       );
 
     } else {
-      setMockedNotes(MockedNote);
+      setUserNotes(storedNotes);
     }
   };
 
+
   useEffect(() => {
-    setMockedNotes(MockedNote);
+    if (storedNotes) {
+      setUserNotes(storedNotes);
+    } else {
+      setUserNotes([]);
+    }
   },[])
 
   useEffect(() => {
@@ -58,7 +68,6 @@ export const Home = () => {
             color={colors.cta}
           />
         </S.Header>
-
         <S.SearchContainer>
           <TextInput
             placeholder="Pesquise sua nota"
@@ -67,25 +76,22 @@ export const Home = () => {
             onChangeText={setSearch}
           />
         </S.SearchContainer>
-
         <S.NoteContainer>
-          {MockedNotes &&
-            MockedNotes.length > 0 &&
-            MockedNotes.map(
-              (note: JSX.IntrinsicAttributes & INoteCardProps) => (
-                <NoteCard
-                  key={note.id}
-                  title={note.title}
-                  id={note.id}
-                  onPress={() => {
-                    navigation.navigate("Note", { note });
-                  }}
-                />
-              )
-            )}
+          {userNotes &&
+            userNotes.length > 0 &&
+            userNotes.map((note: JSX.IntrinsicAttributes & INoteCardProps) => (
+              <NoteCard
+                key={note.id}
+                title={note.title}
+                id={note.id}
+                onPress={() => {
+                  navigation.navigate("Note", { note });
+                }}
+              />
+            ))}
 
-          {!MockedNotes ||
-            (MockedNotes.length === 0 && searchError === false && (
+          {!userNotes ||
+            (userNotes.length === 0 && searchError === false && (
               <NoteCard
                 title={"Nenhuma nota encontrada"}
                 onPress={() => navigation.navigate("CreateNote")}
@@ -93,12 +99,29 @@ export const Home = () => {
             ))}
 
           {searchError && (
-            <S.Note444>
+            <S.Note404>
               <MaterialIcons name="error" size={24} color={colors.error} />
-              <S.Error>Nota não encontrada, verifique o termo pesquisado e tente novamente.</S.Error>
-            </S.Note444>
+              <S.Error>
+                Nota não encontrada, verifique o termo pesquisado e tente
+                novamente.
+              </S.Error>
+            </S.Note404>
           )}
         </S.NoteContainer>
+        <CollapsibleButtonWithDrawer
+          drawerOptions={[
+            {
+              label: "Nova nota",
+              onPress: () => navigation.navigate("CreateNote"),
+              iconName: "plus",
+              iconSize: 20,
+            },
+          ]}
+          iconName="plus"
+          iconSize={26}
+          iconColor={colors.accent}
+          height={50}
+        />
       </S.Content>
     </Container>
   );

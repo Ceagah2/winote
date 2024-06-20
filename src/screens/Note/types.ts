@@ -1,6 +1,7 @@
 export interface INoteProps {
   route: {
     params: {
+      note: any
       id: number
       title: string
       description: string
