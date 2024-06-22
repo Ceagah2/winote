@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "winote",
-    "slug": "winote",
+    "name": "Winote",
+    "slug": "Winote",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.jpeg",
@@ -12,9 +12,17 @@
       "backgroundColor": "#8C001A"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Winote precisa de acesso a sua camera, para que possa gravar suas imagens.",
+        "NSMicrophoneUsageDescription": "Winote precisa de acesso ao seu microfone, para que possa gravar seus audios."
+      }
     },
     "android": {
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -24,7 +32,18 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Winote precisa de acesso à sua câmera para tirar fotos."
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Winote precisa de acesso ao seu microfone para gravar áudio."
+        }
+      ]
     ]
   }
 }

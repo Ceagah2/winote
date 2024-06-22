@@ -1,22 +1,18 @@
-import { Dimensions } from "react-native";
 import styled from "styled-components/native";
+import { useResponsive } from "../../hooks/useResponsive";
 
-const screenHeight = Dimensions.get("window").height;
+type RecordText = {
+  color ?: string;
+}
 
 export const Container = styled.View`
   flex: 1;
-  justify-content: flex-end;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
   background-color: rgba(0, 0, 0, 0.5);
 `;
 
-export const ModalContent = styled.View`
-  height: ${screenHeight * 0.3}px;
-  background-color: white;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  padding: 20px;
-  align-items: center;
-`;
 
 export const ModalHeader = styled.View`
   width: 100%;
@@ -28,12 +24,31 @@ export const CloseButton = styled.TouchableOpacity``;
 
 export const ModalBody = styled.View`
   flex: 1;
-  justify-content: center;
+  width: 100%;
+  height: 100px;
+  justify-content: flex-start;
   align-items: center;
 `;
+export const ButtonContainer = styled.View`
+  flex: 1;
+  width: 100%;
+  height: 100px;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 20px;
+`
 
-export const RecordingText = styled.Text`
+export const RecordButton = styled.Pressable`
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.1);
+`
+
+export const RecordingText = styled.Text<RecordText>`
   margin-top: 20px;
-  font-size: 16px;
-  color: red;
+  text-align: center;
+  font-size: ${useResponsive(12)};
 `;

@@ -13,22 +13,25 @@ import { INotes } from "../../shared/Notes.interface";
 import { colors } from "../../styles";
 import * as S from "./CreateNote.styles";
 
+interface IAudioItem {
+  uri: string;
+  name: string;
+  duration: number;
+}
 
-
-export const CreateNote = () => {
+export const CreateNote = (props: INotes) => {
   const [data, setData] = useState<INotes>({});
-  const [audios, setAudios] = useState([]);
+  const [audios, setAudios] = useState<IAudioItem[]>([]);
   const [playingAudioId, setPlayingAudioId] = useState<number | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [position, setPosition] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [isSliding, setIsSliding] = useState<boolean>(false);
   const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [isCameraOpen, setIsCameraOpen] = useState<boolean>(false);
   const [isMicOpen, setIsMicOpen] = useState<boolean>(false);
 
-  const handlePlayPause = async (audio: (typeof audios)[0]) => {
-    if (playingAudioId === audio.id) {
+  const handlePlayPause = async (audio: IAudioItem, index: number) => {
+    if (playingAudioId === index) {
       if (sound) {
         await sound.pauseAsync();
         setPlayingAudioId(null);
@@ -38,11 +41,11 @@ export const CreateNote = () => {
         await sound.unloadAsync();
       }
       const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: audio.url },
+        { uri: audio.uri },
         { shouldPlay: true }
       );
       setSound(newSound);
-      setPlayingAudioId(audio.id);
+      setPlayingAudioId(index);
 
       newSound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded) {
@@ -67,26 +70,33 @@ export const CreateNote = () => {
     setIsSliding(false);
   };
 
-  const handleDelete = (audioId: number) => {
-    setAudios(audios.filter((audio) => audio.id !== audioId));
-    if (playingAudioId === audioId && sound) {
+  const handleDelete = (index: number) => {
+    setAudios(audios.filter((_, i) => i !== index));
+    if (playingAudioId === index && sound) {
       sound.unloadAsync();
       setPlayingAudioId(null);
     }
   };
+
   const handleSaveNote = () => {
-    console.log(`Salvando dados : ${JSON.stringify(data)}`);
-    storeData(`${data.id}`)
-  }
+    console.log(`Salvando dados: ${JSON.stringify(data)}`);
+    storeData(`@Nota${data.id}`, JSON.stringify(data));
+  };
+
+  const handleRecordingComplete = (uri: string, duration: number) => {
+    const newAudio = {
+      uri,
+      name: `Audio-Nota-${audios.length + 1}`,
+      duration,
+    };
+    setAudios([...audios, newAudio]);
+    setIsMicOpen(false);
+    setIsRecording(false);
+  };
 
   const handleNewAudio = () => {
-    setIsMicOpen(!isMicOpen);
-    console.log('abriu o mic pra gravar')
-  }
-
-   const handleNewPhoto = () => {
-     console.log("Nova Foto");
-   };
+    setIsMicOpen(true);
+  };
 
   useEffect(() => {
     return () => {
@@ -119,55 +129,55 @@ export const CreateNote = () => {
           />
         </S.DescriptionContainer>
         <S.AudioContainer>
-          {audios &&
-            audios.length > 0 &&
-            audios.map((audio) => (
-              <S.Audio key={audio.id}>
-                <S.AudioIcon onPress={() => handlePlayPause(audio)}>
-                  {playingAudioId === audio.id ? (
-                    <Ionicons name="pause" size={20} color={colors.cta} />
-                  ) : (
-                    <Ionicons name="play" size={20} color={colors.cta} />
-                  )}
-                </S.AudioIcon>
-                <S.AudioTitle>{audio.name}</S.AudioTitle>
-                <View style={{ width: 200 }}>
-                  {playingAudioId === audio.id && (
-                    <Slider
-                      style={{ width: 200, height: 40 }}
-                      minimumValue={0}
-                      maximumValue={duration}
-                      value={position}
-                      onValueChange={handleSliderValueChange}
-                      onSlidingStart={() => setIsSliding(true)}
-                      onSlidingComplete={handleSlidingComplete}
-                    />
-                  )}
-                </View>
-                <S.AudioDuration>{audio.duration}</S.AudioDuration>
-
-                <S.AudioIcon onPress={() => handleDelete(audio.id)}>
-                  <Ionicons name="trash" size={20} color={colors.cta} />
-                </S.AudioIcon>
-              </S.Audio>
-            ))}
+          {audios.map((audio, index) => (
+            <S.Audio key={index}>
+              <S.AudioIcon onPress={() => handlePlayPause(audio, index)}>
+                {playingAudioId === index ? (
+                  <Ionicons name="pause" size={20} color={colors.cta} />
+                ) : (
+                  <Ionicons name="play" size={20} color={colors.cta} />
+                )}
+              </S.AudioIcon>
+              <S.AudioTitle>{audio.name}</S.AudioTitle>
+              <View style={{ width: 200 }}>
+                {playingAudioId === index && (
+                  <Slider
+                    style={{ width: 200, height: 40 }}
+                    minimumValue={0}
+                    maximumValue={duration}
+                    value={position}
+                    onValueChange={handleSliderValueChange}
+                    onSlidingStart={() => setIsSliding(true)}
+                    onSlidingComplete={handleSlidingComplete}
+                  />
+                )}
+              </View>
+              <S.AudioDuration>{audio.duration}</S.AudioDuration>
+              <S.AudioIcon onPress={() => handleDelete(index)}>
+                <Ionicons name="trash" size={20} color={colors.cta} />
+              </S.AudioIcon>
+            </S.Audio>
+          ))}
         </S.AudioContainer>
-          <Modal visible={isMicOpen} onClose={() => setIsMicOpen(false)} >
-            <S.AudioTitle> Modal esta aberto</S.AudioTitle>
-          </Modal>
-          
+        <Modal
+          visible={isMicOpen}
+          onClose={() => setIsMicOpen(false)}
+          isRecording={isRecording}
+          setIsRecording={setIsRecording}
+          onRecordingComplete={handleRecordingComplete}
+        />
       </S.Content>
       <CollapsibleButtonWithDrawer
         drawerOptions={[
           {
             label: "Novo áudio",
-            onPress: () => handleNewAudio(),
+            onPress: handleNewAudio,
             iconName: "microphone",
             iconSize: 20,
           },
           {
             label: "Nova foto",
-            onPress: () => handleNewPhoto(),
+            onPress: () => console.log("Nova Foto"),
             iconName: "camera",
             iconSize: 20,
           },
