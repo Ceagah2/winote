@@ -1,15 +1,15 @@
-import React, { useEffect } from "react";
-import { storeData } from "../../services/getStorage";
-import { useAtom } from "jotai";
-import { isOnboardedAtom, initializeIsOnboardedAtom } from "../../store/globalStates";
 import { useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../../shared/navigationTypes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import takeNotes from "../../../assets/img/takeNotes.jpg";
-import recAudio from "../../../assets/img/recAudio.jpg";
-import takePictures from "../../../assets/img/takePictures.jpg";
+import { useAtom } from "jotai";
+import React, { useEffect } from "react";
 import AppIntroSlider from "react-native-app-intro-slider";
-import * as S from './Slider.styles'
+import recAudio from "../../../assets/img/recAudio.jpg";
+import takeNotes from "../../../assets/img/takeNotes.jpg";
+import takePictures from "../../../assets/img/takePictures.jpg";
+import { storeData } from "../../hooks/useStorage";
+import { RootStackParamList } from "../../shared/navigationTypes";
+import { initializeIsOnboardedAtom, isOnboardedAtom } from "../../store/globalStates";
+import * as S from './Slider.styles';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "Home">;
 

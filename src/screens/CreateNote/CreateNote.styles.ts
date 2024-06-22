@@ -58,6 +58,14 @@ export const AudioDuration = styled.Text`
   color: ${colors.text};
 
 `
+export const ModalContainer = styled.Text`
+  width:100%;
+  height: 300px;
+  justify-content: center;
+  align-items: center;
+  background: red;
+`
+export const ModalTitle = styled.Text`
 
-
+`
 export const CameraRoll = styled.View``;

@@ -16,11 +16,11 @@ import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
+import { getData } from './src/hooks/useStorage';
 import { CreateNote } from './src/screens/CreateNote';
 import { Home } from './src/screens/Home';
 import { Note } from './src/screens/Note';
 import { Slider } from './src/screens/Slider';
-import { getData } from './src/services/getStorage';
 import { RootStackParamList } from './src/shared/navigationTypes';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
