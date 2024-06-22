@@ -119,19 +119,20 @@ export const Modal = ({
           </S.CloseButton>
         </S.ModalHeader>
         <S.ModalBody>
-          <S.RecordingText>
-            {" "}
-            Aperte e segure o botão para iniciar sua gravação.{" "}
-          </S.RecordingText>
+          {!isRecording && (
+            <S.RecordingText>
+              Aperte e segure o botão para iniciar sua gravação.
+            </S.RecordingText>
+          )}
           <S.ButtonContainer>
             <S.RecordButton
               onPressIn={handleRecordingStart}
               onPressOut={handleRecordingStop}
             >
               {!isRecording ? (
-                <Ionicons name="mic" size={64} color="black" />
+                <Ionicons name="mic-outline" size={64} color="black" />
               ) : (
-                <Ionicons name="microphone" size={64} color="black" />
+                <Ionicons name="mic" size={64} color="black" />
               )}
             </S.RecordButton>
             {isRecording && (

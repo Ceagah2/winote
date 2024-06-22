@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 import { Audio } from "expo-av";
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { Alert, View } from "react-native";
 import { CollapsibleButtonWithDrawer } from "../../components/CollapseButtonWithDrawer";
 import { Container } from "../../components/Container";
 import { Header } from "../../components/Header";
@@ -16,7 +16,7 @@ import * as S from "./CreateNote.styles";
 interface IAudioItem {
   uri: string;
   name: string;
-  duration: number;
+  duration: string;
 }
 
 export const CreateNote = (props: INotes) => {
@@ -71,19 +71,40 @@ export const CreateNote = (props: INotes) => {
   };
 
   const handleDelete = (index: number) => {
-    setAudios(audios.filter((_, i) => i !== index));
-    if (playingAudioId === index && sound) {
-      sound.unloadAsync();
-      setPlayingAudioId(null);
-    }
+    Alert.alert("Excluir", "Tem certeza que deseja excluir esta nota?", [
+      {
+        text: "Nao quero deletar",
+        style: "cancel",
+      },
+      {
+        text: "Tenho certeza",
+        style: "destructive",
+        onPress: () => {
+          setAudios(audios.filter((_, i) => i !== index));
+          if (playingAudioId === index && sound) {
+            sound.unloadAsync();
+            setPlayingAudioId(null);
+          }
+        },
+      },
+    ])
   };
 
   const handleSaveNote = () => {
-    console.log(`Salvando dados: ${JSON.stringify(data)}`);
     storeData(`@Nota${data.id}`, JSON.stringify(data));
   };
 
-  const handleRecordingComplete = (uri: string, duration: number) => {
+  const formatDuration = (durationMillis: number): string => {
+    const totalSeconds = Math.floor(durationMillis / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  const handleRecordingComplete = async (uri: string) => {
+    const { sound } = await Audio.Sound.createAsync({ uri });
+    const status = await sound.getStatusAsync();
+    const duration = formatDuration(status.durationMillis);
     const newAudio = {
       uri,
       name: `Audio-Nota-${audios.length + 1}`,
@@ -92,6 +113,7 @@ export const CreateNote = (props: INotes) => {
     setAudios([...audios, newAudio]);
     setIsMicOpen(false);
     setIsRecording(false);
+    sound.unloadAsync(); 
   };
 
   const handleNewAudio = () => {
@@ -139,7 +161,7 @@ export const CreateNote = (props: INotes) => {
                 )}
               </S.AudioIcon>
               <S.AudioTitle>{audio.name}</S.AudioTitle>
-              <View style={{ width: 200 }}>
+              <View style={{ width: 180 }}>
                 {playingAudioId === index && (
                   <Slider
                     style={{ width: 200, height: 40 }}
